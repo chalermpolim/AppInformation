@@ -1,6 +1,8 @@
 package com.artrees.appinformation;
 
 import android.content.Context;
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.StrictMode;
 import android.view.View;
@@ -10,14 +12,17 @@ import android.widget.Button;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
+import com.artrees.appinformation.LocationBased.GPSTracker;
 import com.artrees.appinformation.Message.MemberShip;
 import com.artrees.appinformation.Model.SynData;
 import com.artrees.appinformation.Utility.LoadingTask.FeedLoadingTask;
 
 public class MainActivity extends BaseActivity {
     private Button bt_loaddata;
+    private Button bt_gpslocation;
     protected ProgressBar progress;
 
+    private GPSTracker gps;
     @Override
     protected int getLayoutResId() {
         return R.layout.activity_main;
@@ -35,11 +40,35 @@ public class MainActivity extends BaseActivity {
 
         this.progress.setVisibility(View.GONE);
         this.bt_loaddata = (Button) findViewById(R.id.bt_loaddata);
+        this.bt_gpslocation = (Button)findViewById(R.id.bt_gps);
 
         this.bt_loaddata.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 new WebServiceLoadingTask(MainActivity.this, "Information").execute();
+            }
+        });
+
+        this.bt_gpslocation.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                gps = new GPSTracker(MainActivity.this);
+
+                if (gps.canGetLocation()) {
+                    double latitude = gps.getLatitude();
+                    double longitude = gps.getLongitude();
+
+                    // delay to enable 3 time
+                    if (latitude == 0.0f && longitude == 0.0) {
+                        Toast.makeText(MainActivity.this, "GPS not prompt try click again", Toast.LENGTH_LONG).show();
+                    } else {
+                        Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("http://maps.google.com/maps?saddr=Current%20Location&daddr=13.7613496,100.4530624"));
+                        startActivity(intent);
+                    }
+
+                } else {
+                    gps.showSettingsAlert();
+                }
             }
         });
 

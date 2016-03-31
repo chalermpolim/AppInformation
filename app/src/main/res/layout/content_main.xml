@@ -18,6 +18,12 @@
         android:layout_height="wrap_content"
         android:text="Load Data" />
 
+    <Button
+        android:id="@+id/bt_gps"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="GPS Location" />
+
     <ProgressBar
         android:id="@+id/progress"
         android:layout_width="wrap_content"
